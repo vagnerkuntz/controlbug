@@ -1,4 +1,6 @@
-import React, {useEffect} from 'react';
+import React from 'react';
+import {ParamListBase, useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {
   View,
   StyleSheet,
@@ -9,43 +11,32 @@ import {
 } from 'react-native';
 import {useNetInfo} from '@react-native-community/netinfo';
 
-import database from '@react-native-firebase/database';
-
-
 const HomeScreen: React.FC = () => {
   const netInfo = useNetInfo();
-
-  useEffect(() => {
-    // adiciona os dados no banco
-    // database()
-    //   .ref('/users/123')
-    //   .set({
-    //     name: 'Ada Lovelace',
-    //     age: 31,
-    //   })
-    //   .then(() => console.log('Data set.'));
-    // lendo unico value
-    //  database()
-    //    .ref('/users/123')
-    //    .once('value')
-    //    .then(snapshot => {
-    //      console.log('User data: ', snapshot.val());
-    //    });
-    // const remove = async () => {
-    //   await database().ref('/users/123').remove();
-    // };
-    //
-    // remove();
-  }, []);
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
 
   return (
-    <SafeAreaView style={{backgroundColor: '#fff'}}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'space-around',
+      }}>
       <StatusBar
         backgroundColor="#fff"
         translucent={true}
         barStyle="dark-content"
       />
-      <Text>...</Text>
+      <View>
+        <Pressable
+          style={styles.button}
+          onPress={() =>
+            navigation.navigate({key: 'ErrorScreen', name: 'ErrorScreen'})
+          }>
+          <Text style={styles.text}>Click para testar</Text>
+        </Pressable>
+      </View>
       <View>
         <Pressable
           style={[
@@ -54,7 +45,9 @@ const HomeScreen: React.FC = () => {
           ]}
           disabled={!netInfo.isInternetReachable}
           onPress={() => console.log('on press')}>
-          <Text style={styles.text}>Tem internet?</Text>
+          <Text style={styles.text}>
+            {netInfo.isInternetReachable ? 'Internet OK!' : 'Sem conexão'}
+          </Text>
         </Pressable>
       </View>
     </SafeAreaView>
@@ -69,6 +62,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     borderRadius: 4,
     elevation: 3,
+    backgroundColor: '#f0f',
   },
   text: {
     fontSize: 16,
