@@ -1,17 +1,13 @@
 import React from 'react';
-import {View, Button, SafeAreaView, Text} from 'react-native';
-import {useNetInfo} from '@react-native-community/netinfo';
+import {NavigationContainer} from '@react-navigation/native';
+
+import MainStack from './src/navigators/MainStack';
 
 const App: React.FC = () => {
-  const netInfo = useNetInfo();
-
   return (
-    <SafeAreaView>
-      <Text>...</Text>
-      <View>
-        <Button title="internet?" disabled={!netInfo.isInternetReachable} />
-      </View>
-    </SafeAreaView>
+    <NavigationContainer>
+      <MainStack />
+    </NavigationContainer>
   );
 };
 
