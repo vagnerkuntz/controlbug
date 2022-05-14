@@ -1,71 +1,63 @@
-import React, {useState, useEffect} from 'react';
-import {View, Text, Image} from 'react-native';
-import {captureRef, captureScreen} from 'react-native-view-shot';
+import React, {useState, useRef, useCallback, useEffect} from 'react';
+import {Text, Image} from 'react-native';
+
+import ViewShot from 'react-native-view-shot';
+import RNFS from 'react-native-fs';
+
 import uuid from 'react-native-uuid';
 import database from '@react-native-firebase/database';
-import * as Console from 'console';
+
+import { sendEmail } from '../utils/send-email';
 
 const ErrorScreen: React.FC = () => {
-  const [url, setUrl] = useState<any>();
+  const viewShotRef = useRef();
+  const [source, setSource] = useState<any>(null);
 
-  const capture = () => {
-    captureRef(viewRef, {
-      format: "jpg",
-      quality: 0.8
-    }).then(
-      uri => {
-        console.log("Image saved to", uri);
-        setUrl(uri);
-      },
-      error => console.error("Oops, snapshot failed", error)
-    );
-
-    captureScreen({
-      format: 'jpg',
-      quality: 0.8,
-    }).then(
-      uri => {
-        setUrl(uri);
-      },
-      error => {
-        console.error('Oops, snapshot failed', error);
-        // errorCaptureScreen = error;
-      },
-    );
-
-    console.log(url);
-  };
+  const onCapture = useCallback(() => {
+    viewShotRef?.current?.capture().then(async (uri: any) => {
+      const data = await RNFS.readFile(uri, 'base64');
+      setSource({ uri: 'data:image/png;base64,' + data });
+    });
+  }, []);
 
   useEffect(() => {
     try {
       console.log(window.device.version);
     } catch (error: any) {
-      // const errorMessage = error?.message;
-      // let errorCaptureScreen = '';
-      console.log('bateu');
-      capture();
+      onCapture()
+    }
+  }, [])
 
+  useEffect(() => {
+    if (source?.uri) {
+      console.log('gerou uma foto no banco')
       // database()
       //   .ref(`/error/${uuid.v4()}`)
       //   .set({
-      //     errorMessage,
-      //     errorCaptureScreen,
+      //     errorMessage: 'Erro de teste',
+      //     errorCaptureScreen: 'Teste',
+      //     imageBase64: source?.uri
       //   })
       //   .then(() => console.log('Data set.'));
     }
-  }, []);
+  }, [source])
+  
 
   return (
-    <View>
-      <Text>Tela de erro</Text>
-      <Image
-        source={{
-          uri: url,
-        }}
-        style={{width: 350, height: 350}}
-      />
-      <Text>Tela de erro</Text>
-    </View>
+    <>
+      {source?.uri ? <Image source={{ uri: source?.uri }} style={{width: 500, height: 500, resizeMode: 'contain', borderWidth: 1, borderColor: 'red'}} /> : (
+        <>
+          <Text>sem imagem</Text>
+        </>
+      )}
+
+      <ViewShot ref={viewShotRef}>
+        <Text>---------------------</Text>
+        <Text>Tela de erro</Text>
+        <Text>---------------------</Text>
+        <Text>Tela de erro</Text>
+      </ViewShot>
+    </>
   );
 };
 
