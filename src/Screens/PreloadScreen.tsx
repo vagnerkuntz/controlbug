@@ -1,29 +1,31 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   ParamListBase,
   useNavigation,
   CommonActions,
 } from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-
-import LottieView from 'lottie-react-native';
+import {SvgUri} from 'react-native-svg';
 
 const Preload: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
 
+  useEffect(
+    () =>
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 1,
+          routes: [{name: 'Home'}],
+        }),
+      ),
+    [],
+  );
+
   return (
-    <LottieView
-      source={require('../assets/bug.json')}
-      autoPlay
-      loop={false}
-      onAnimationFinish={() =>
-        navigation.dispatch(
-          CommonActions.reset({
-            index: 1,
-            routes: [{name: 'Home'}],
-          }),
-        )
-      }
+    <SvgUri
+      width="100%"
+      height="100%"
+      uri="http://thenewcode.com/assets/images/thumbnails/homer-simpson.svg"
     />
   );
 };
